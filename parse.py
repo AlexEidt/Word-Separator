@@ -33,6 +33,7 @@ def parse(text_data=None):
     # data stores all stories.
     data = []
     if text_data is None:
+        print('Parsing data from web. This may take a bit')
         text = BeautifulSoup(requests.get(URL).text, features='lxml')
         
 
@@ -48,6 +49,7 @@ def parse(text_data=None):
             for result in cf.as_completed(results):
                 data.append(result.result())
     else:
+        print('Processing user input')
         data.append(text_data)
 
     # Remove ,.'";:?!()-\n from the text.
@@ -76,7 +78,8 @@ def parse(text_data=None):
         (words_df.index.str.len() > 1) | (words_df.index == 'i') | (words_df.index == 'a')
     ]
 
-    words_df.to_csv('words.csv')
+    words_df.to_csv('Data/words.csv')
+    print('words.csv has been created')
 
     return words_df
 

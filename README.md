@@ -121,7 +121,56 @@ Finally, we create `letterMap.json`, which keep track of each letter of each wor
     ...
 ```
 
-We can now use these files to build up the graphs shown in the figures above and use the algorithm to find the best match.
+We can now use these files to build up the graphs shown in the figures above and use the algorithm to find the best match. Using `letterMap.json`, we traverse the input string letter by letter and keep track of all the possible words that the input string could start with. We keep track of these options as a list. Then we loop through each item of this list, and repeat this process with this item removed from the beginning of the input string. Doing so creates the graph of possible word shown above. This is stored as a series of nested dictionaries, where the keys are the `word-score` pairing, and the values are the other options after that.
+
+```
+{
+    "i-129": {
+        "ha-269": {},
+        "have-12840": {
+            "no-405": {
+                "special-33540366820": {
+                    "tale-1453765": {},
+                    "talent-54589403": {},
+                    "talents-7784188093": {
+                        "i-129": {
+                            "a-180": {
+                                "mon-19440": {}
+                            },
+                            "am-367": {
+                                "on-368": {},
+                                "only-399": {
+                                    "pass-380375": {
+                                        "i-129": {
+                                            "on-368": {
+                                                "a-180": {},
+                                                "at-446": {},
+                                                "ate-4578": {}
+                                            }
+                                        }
+                                    },
+                                    "passion-81623139519": {
+                                        "a-180": {},
+                                        "at-446": {},
+                                        "ate-4578": {}
+                                    },
+                                    "passionate-81144854592212384": {},
+                                    "passionately-15391432384911147008": {
+                                        "curious-74103704": {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "haven-613184": {}
+    }
+}
+```
+
+We then traverse this dictionary layer by layer, always choosing the word with the largest score. We do this recursively so we can back track when we run into a dead end. We continue traversal until we find a path that builds up a string equal to the input. This means that if there were any words in the input that are not contained in the dataset, the algorithm will fail.
 
 ## Usage
 
@@ -136,21 +185,26 @@ Once you start it up, you should see something like this:
 ```
 Welcome to the Word Separator!
 
-Enter a string of words below. If you enter a word that isn't in words.csv, then the program will crash!
+Enter a string of words below.
+
 Example:
         hellotherehowareyou -> hello there how are you
-Enter a series of words with no punctuation or spaces: hellotherehowareyou
-hello there how are you
-Continue? (Press enter to quit, any other key to continue): y
-Enter a series of words with no punctuation or spaces: thealgorithmwillnotcrackthiscode
-the algorithm will not crack this code
-Continue? (Press enter to quit, any other key to continue): y
-Enter a series of words with no punctuation or spaces: mountainsaresnowyinthewintermaybeyoudidnotknowthat
-mountains are snowy in the winter maybe youd id not know that
-Continue? (Press enter to quit, any other key to continue):
-```
 
-As you can see in the last example, the algorithm isn't alwasy perfect, but it does get close!
+If you'd like to train the algorithm based on your own data set, place a file
+containing lots of words separated by spaces in this directory and enter the file name below.
+The more words there are, the better the algorithm will be.
+
+Enter File Name (Press Enter/Return to skip):
+Enter a series of words with no punctuation or spaces (Press Enter/Return to skip): hellotherehowareyou
+hello there how are you
+Enter a series of words with no punctuation or spaces (Press Enter/Return to skip): ihavenospecialtalentsiamonlypassionatelycurious
+i have no special talents i am only passionately curious
+Enter a series of words with no punctuation or spaces (Press Enter/Return to skip): thisalgorithmwilltryitsbesttocrackyourstrings
+this algorithm will try its best to crack your strings
+Enter a series of words with no punctuation or spaces (Press Enter/Return to skip): thiswordisnonsensedcjslcmx
+Input contains words not present in words.csv. Could not break apart string.
+Enter a series of words with no punctuation or spaces (Press Enter/Return to skip): 
+```
 
 ## Dependencies
 

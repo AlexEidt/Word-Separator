@@ -12,7 +12,7 @@ from collections import Counter
 from parse import parse
 
 
-def create_dfs(words_df, n=15, min_len=5, min_count=100):
+def create_dfs(words_df):
     """
     Based on the words in words_df, this function creates two pandas DataFrames
     and one dictionary storing information for the word list.
@@ -41,12 +41,6 @@ def create_dfs(words_df, n=15, min_len=5, min_count=100):
     in a dictionary, and its value is another dictionary containing the next letter as a key whose
     value is the next letter in the word and so on. This graph is built up for every word in
     words_df as a way to parse each letter in the input text from the user.
-
-    Returns
-
-    word_length_df
-    letters_df
-    letter_map
     """
     # For English, filter out all words that have length 2 and occur less than 100 times
     words_df = words_df[
@@ -74,7 +68,8 @@ def create_dfs(words_df, n=15, min_len=5, min_count=100):
     word_length_df['Count'] /= word_length_df['Count'].sum()
     word_length_df['Count'] *= 1000
 
-    word_length_df.to_csv('word_length.csv')
+    word_length_df.to_csv('Data/word_length.csv')
+    print('word_length.csv has been created')
     del word_length_df
 
     letter_df = pd.DataFrame.from_dict({
@@ -111,7 +106,8 @@ def create_dfs(words_df, n=15, min_len=5, min_count=100):
 
     letter_df.sort_index(inplace=True)
 
-    letter_df.to_csv('letters.csv')
+    letter_df.to_csv('Data/letters.csv')
+    print('letters.csv has been created')
 
     # Dictionary representing a directed graph that maps each letter of each word
     # to the next letter in that word and so on.
@@ -126,5 +122,7 @@ def create_dfs(words_df, n=15, min_len=5, min_count=100):
                 temp[letter]['|'] = None
             temp = temp[letter]
 
-    with open('letterMap.json', mode='w') as f:
+    with open('Data/letterMap.json', mode='w') as f:
         json.dump(letter_map, f, sort_keys=True)
+    
+    print('letterMap.json has been created')

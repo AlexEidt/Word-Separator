@@ -6,51 +6,51 @@ and has the user enter the strings they'd like to be separated.
 """
 
 import os
+import re
 import json
 import pandas as pd
 from parse import parse
 from process import create_dfs
 
 
-def process(text, data=None):
+def get_dfs(data=None):
     """
-    Processes the given 'text' which is a string with no punctuation
-    or spaces.
+    Parses 'word_length.csv', 'letters.csv' and 'letterMap.json' as a Data
+    Structures and returns them.
 
     Parameters:
-
-    text: Text from user input.
 
     data: Optional. If the user wishes to 'train' the algorithm based on their
           own word set, they can pass that in as a string.
     """
-    current_dir = set(os.listdir())
-    if 'words.csv' not in current_dir:
+    data_dir = set(os.listdir(os.path.join(os.getcwd(), 'Data')))
+    if 'words.csv' not in data_dir or data is not None:
         words_df = parse(data)
     else:
-        words_df = pd.read_csv('words.csv', index_col=0, keep_default_na=False)
+        words_df = pd.read_csv('Data/words.csv', index_col=0, keep_default_na=False)
 
-    if 'word_length.csv' not in current_dir or \
-        'letters.csv' not in current_dir or \
-        'letterMap.json' not in current_dir:
+    if 'word_length.csv' not in data_dir or \
+        'letters.csv' not in data_dir or \
+        'letterMap.json' not in data_dir or \
+        data is not None:
         create_dfs(words_df)
 
-    word_length_df = pd.read_csv('word_length.csv', index_col=0, keep_default_na=False)
-    letter_df = pd.read_csv('letters.csv', index_col=0, keep_default_na=False)
+    word_length_df = pd.read_csv('Data/word_length.csv', index_col=0, keep_default_na=False)
+    letter_df = pd.read_csv('Data/letters.csv', index_col=0, keep_default_na=False)
     
-    with open('letterMap.json', mode='r') as f:
+    with open('Data/letterMap.json', mode='r') as f:
         letter_map = json.load(f)
 
-    return find_words(text, word_length_df, letter_df, letter_map)
+    return word_length_df, letter_df, letter_map
 
 
-def find_words(sample, word_length_df, letter_df, letter_map):
+def find_words(user_input, word_length_df, letter_df, letter_map):
     """
     The word separator algorithm is implemented here.
 
     Parameters:
 
-    sample: The input text from the user
+    user_input: The input text from the user
     word_length_df: The DataFrame mapping word lengths to counts
     letter_df: The DataFrame containing statistics about the occurence of letters
                in the given dataset.
@@ -97,49 +97,65 @@ def find_words(sample, word_length_df, letter_df, letter_map):
                 graph[key] = {}
                 traverse(text.replace(choice, '', 1), graph[key])
 
-    traverse(sample, word_graph)
+    # Traverse through the user input and fill up the word graph of possibilities
+    traverse(user_input, word_graph)
 
     output = []
     # Find the best path through the graph to create the sentence
     def best_path(graph):
+        if ''.join(output) == user_input:
+            return ' '.join(output)
         if graph:
             key_map = {}
             for key in graph:
                 word, priority = key.split('-', 1)
                 priority = int(priority)
+                # If two words have same priority, add 1 until priorities are unique
                 while priority in key_map:
                     priority += 1
                 key_map[priority] = word
             # Go to word with largest score first
             for key in sorted(key_map, reverse=True):
                 output.append(key_map[key])
-                if ''.join(output) == sample:
-                    print(' '.join(output))
-                    break
-                best_path(graph[f'{key_map[key]}-{key}'])
-        output.pop()
+                so_far = best_path(graph[f'{key_map[key]}-{key}'])
+                if so_far:
+                    return so_far
+        if output:
+            output.pop()
+        return None
 
-    best_path(word_graph)
+    return best_path(word_graph)
 
 
 if __name__ == '__main__':
     print('Welcome to the Word Separator!\n')
-    print("Enter a string of words below. If you enter a word that isn't in words.csv, then the program will crash!\n")
+    print('Enter a string of words below.\n')
     print('Example:')
     print('\thellotherehowareyou -> hello there how are you\n')
-    print("If you'd like to train the algorithm based on your own data set, delete words.csv from")
-    print('this directory and enter the file name containing lots of words separated by spaces.')
-    print('The more words there are, the better the algorithm will be.')
+    print("If you'd like to train the algorithm based on your own data set, place a file")
+    print('containing lots of words separated by spaces in this directory and enter the file name below.')
+    print('The more words there are, the better the algorithm will be.\n')
+
     file_name = input('Enter File Name (Press Enter/Return to skip): ')
+    while file_name and file_name not in os.listdir():
+        file_name = input('File not found in this directory.\nPlease enter another file name (Press Enter/Return to skip): ')
 
     text = None
     if file_name:
         with open(file_name, mode='r') as f:
-            f.read()
+            text = f.read()
 
-    cont = 'y'
-    while cont:
-        word = input('Enter a series of words with no punctuation or spaces: ')
-        word = word.replace(' ', '').lower()
-        process(word, data=text)
-        cont = input('Continue? (Press enter to quit, any other key to continue): ')
+    # Get all Data Structures required for the algorithm.
+    word_length_df, letter_df, letter_map = get_dfs(text)
+    del text
+
+    word = input('Enter a series of words with no punctuation or spaces (Press Enter/Return to quit): ')
+    while word:
+        # Remove all spaces and non-letter characters. Make 'word' lowercase.
+        word = re.sub(r'[^a-z]+', '', word.replace(' ', '').lower())
+        output = find_words(word, word_length_df, letter_df, letter_map)
+        if output is None:
+            print('Input contains words not present in words.csv. Could not break apart string.')
+        else:
+            print(output)
+        word = input('Enter a series of words with no punctuation or spaces (Press Enter/Return to quit): ')
