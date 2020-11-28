@@ -144,7 +144,7 @@ hello there how are you
 Continue? (Press enter to quit, any other key to continue): y
 Enter a series of words with no punctuation or spaces: thealgorithmwillnotcrackthiscode
 the algorithm will not crack this code
-Continue? (Press enter to quit, any other key to continue): mountainsaresnowyinthewintermaybeyoudidnotknowthat
+Continue? (Press enter to quit, any other key to continue): y
 Enter a series of words with no punctuation or spaces: mountainsaresnowyinthewintermaybeyoudidnotknowthat
 mountains are snowy in the winter maybe youd id not know that
 Continue? (Press enter to quit, any other key to continue):
