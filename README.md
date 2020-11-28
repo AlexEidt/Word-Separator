@@ -20,7 +20,7 @@ The exercise and challenge is to automate this process. This is explained in the
 
 ## Theory
 
-In order for an algorithm to be able to break apart strings of words with no spaces, it will need some way of knowing how "valid" certain words are. To this, we'll first need to acquire a large text sample in the language of the string we'd like to break apart. In this case that would be English. With this large text sample, we will split by white space (' ') to create a list of words. We'll standardize the data by making everything lowercase and removing all punctuation. Using this, we'll gather some important data from the words.
+In order for an algorithm to be able to break apart strings of words with no spaces, it will need some way of knowing how "valid" certain words are. To do this, we'll first need to acquire a large text sample in the language of the string we'd like to break apart. In this case that would be English. With this large text sample, we will split by white space (' ') to create a list of words. We'll standardize the data by making everything lowercase and removing all punctuation. Using this, we'll gather some important data from the words.
 
 * We'll keep track of the length of words. We'll count how many times words of a certain length appear.
 * We'll keep track of the number of times a certain letter is the first letter of a word, and the number of times letters are the last letter of a word.
@@ -34,7 +34,7 @@ Now that we've done some data processing, we need to figure out how to use it. F
 
 <br />
 
-As we can see, as we go down a certain path in the graph, we build up a word. The actual default data set used for this project contains 26756 words, however the `.json` file the graph is stored in is only 776 kB, so this is a memory efficient approach.
+As we can see, as we go down a certain path in the graph, we build up a word. The actual default data set used for this project contains 26756 words, however the `.json` file the graph is stored in is only 776 kB, so this is a memory efficient approach. Unfortunately, however, this means that we can only use this algorithm for words that the algorithm has seen before.
 
 Now we can use this data structure to build up words in the input string. We loop through the string letter by letter, traversing the letter graph shown above as we go. When we find matches, we keep note. Whenever a child node of a node contains the `|` character, we know that the word we've built up until that point is a valid word. We continue to traverse the graph until we've reached the end of a path. We keep track of all these matches in a list, and once we've gone as far as we can, we loop through each item in the list, removing this item from the beginning of the input string and repeating the process.
 
@@ -80,7 +80,7 @@ Word Length | Count
 
 We create `letters.csv` which keep track of the number of times a certain letter is the first letter of a word, the number of times letters are the last letter of a word, the frequency of each letter in the sample text as well as the letter order matrix described above. 
 
-### 'letters.csv'
+### `letters.csv`
 
 To make numbers manageable, all values are percentages multiplied by 1000.
 

@@ -126,11 +126,20 @@ if __name__ == '__main__':
     print('Welcome to the Word Separator!\n')
     print("Enter a string of words below. If you enter a word that isn't in words.csv, then the program will crash!\n")
     print('Example:')
-    print('\thellotherehowareyou -> hello there how are you')
+    print('\thellotherehowareyou -> hello there how are you\n')
+    print("If you'd like to train the algorithm based on your own data set, delete words.csv from")
+    print('this directory and enter the file name containing lots of words separated by spaces.')
+    print('The more words there are, the better the algorithm will be.')
+    file_name = input('Enter File Name (Press Enter/Return to skip): ')
+
+    text = None
+    if file_name:
+        with open(file_name, mode='r') as f:
+            f.read()
 
     cont = 'y'
     while cont:
         word = input('Enter a series of words with no punctuation or spaces: ')
         word = word.replace(' ', '').lower()
-        process(word)
+        process(word, data=text)
         cont = input('Continue? (Press enter to quit, any other key to continue): ')
